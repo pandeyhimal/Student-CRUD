@@ -1,23 +1,23 @@
-const express = require('express');
-const { connectToDB, getDB } = require('./db');
-const { ObjectId } = require('mongodb');
-require('dotenv').config();
+const express = require("express");
+const { connectToDB, getDB } = require("./db");
+const { ObjectId } = require("mongodb");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 
 connectToDB().then(() => {
   const db = getDB();
-  const students = db.collection('students');
+  const students = db.collection("students");
 
   //  CREATE student
-  app.post('/students', async (req, res) => {
+  app.post("/students", async (req, res) => {
     const student = req.body;
 
     // Check duplicate email
     const exists = await students.findOne({ email: student.email });
     if (exists) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     try {
@@ -29,24 +29,27 @@ connectToDB().then(() => {
   });
 
   //  READ all students
-  app.get('/students', async (req, res) => {
+  app.get("/students", async (req, res) => {
     const all = await students.find().toArray();
     res.json(all);
   });
 
   //  READ one student
-  app.get('/students/:id', async (req, res) => {
+  app.get("/students/:id", async (req, res) => {
     try {
-      const student = await students.findOne({ _id: new ObjectId(req.params.id) });
-      if (!student) return res.status(404).json({ message: 'Student not found' });
+      const student = await students.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+      if (!student)
+        return res.status(404).json({ message: "Student not found" });
       res.json(student);
     } catch {
-      res.status(400).json({ message: 'Invalid ID format' });
+      res.status(400).json({ message: "Invalid ID format" });
     }
   });
 
   // UPDATE student
-  app.put('/students/:id', async (req, res) => {
+  app.put("/students/:id", async (req, res) => {
     try {
       const result = await students.updateOne(
         { _id: new ObjectId(req.params.id) },
@@ -54,17 +57,19 @@ connectToDB().then(() => {
       );
       res.json(result);
     } catch {
-      res.status(400).json({ message: 'Invalid ID format' });
+      res.status(400).json({ message: "Invalid ID format" });
     }
   });
 
   //  DELETE student
-  app.delete('/students/:id', async (req, res) => {
+  app.delete("/students/:id", async (req, res) => {
     try {
-      const result = await students.deleteOne({ _id: new ObjectId(req.params.id) });
+      const result = await students.deleteOne({
+        _id: new ObjectId(req.params.id),
+      });
       res.json(result);
     } catch {
-      res.status(400).json({ message: 'Invalid ID format' });
+      res.status(400).json({ message: "Invalid ID format" });
     }
   });
 
